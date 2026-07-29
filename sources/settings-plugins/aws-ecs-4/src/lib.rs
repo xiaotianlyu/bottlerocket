@@ -9,7 +9,7 @@ struct AwsEcs4Settings {
     host_containers: bottlerocket_settings_models::HostContainersSettingsV1,
     bootstrap_commands: bottlerocket_settings_models::BootstrapCommandsSettingsV1,
     bootstrap_containers: bottlerocket_settings_models::BootstrapContainersSettingsV1,
-    ntp: bottlerocket_settings_models::NtpSettingsV1,
+    ntp: bottlerocket_settings_models::NtpSettingsV2,
     network: bottlerocket_settings_models::NetworkSettingsV1,
     kernel: bottlerocket_settings_models::KernelSettingsV1,
     boot: bottlerocket_settings_models::BootSettingsV1,
