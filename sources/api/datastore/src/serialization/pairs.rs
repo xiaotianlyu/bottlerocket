@@ -523,6 +523,51 @@ mod test {
         );
     }
 
+    // TEMP: verify whether a list of OBJECTS (not scalars) can round-trip
+    // through the datastore. Delete after checking.
+    #[derive(PartialEq, Debug, Serialize, serde::Deserialize)]
+    struct Entry {
+        address: String,
+        directive: String,
+        options: Vec<String>,
+    }
+
+    #[derive(PartialEq, Debug, Serialize, serde::Deserialize)]
+    struct WithObjectList {
+        time_servers: Vec<Entry>,
+    }
+
+    #[test]
+    fn temp_list_of_objects() {
+        let val = WithObjectList {
+            time_servers: vec![
+                Entry {
+                    address: "169.254.169.123".to_string(),
+                    directive: "server".to_string(),
+                    options: vec!["iburst".to_string(), "prefer".to_string()],
+                },
+                Entry {
+                    address: "time.aws.com".to_string(),
+                    directive: "pool".to_string(),
+                    options: vec![],
+                },
+            ],
+        };
+        // 1. serialize (store)
+        let keys = to_pairs(&val).unwrap();
+        println!("PAIRS PRODUCED: {:#?}", keys);
+
+        // 2. deserialize (read back) and compare — full round-trip.
+        //    to_pairs prefixes keys with the struct name, so read back with it.
+        let back: WithObjectList = crate::deserialization::from_map_with_prefix(
+            Some("WithObjectList".to_string()),
+            &keys,
+        )
+        .unwrap();
+        assert_eq!(val, back, "round-trip mismatch");
+        println!("ROUND-TRIP OK: read back == original");
+    }
+
     #[test]
     fn empty_value() {
         let val: toml::Value = toml::from_str("").unwrap();
