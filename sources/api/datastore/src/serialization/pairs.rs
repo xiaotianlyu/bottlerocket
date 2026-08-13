@@ -523,8 +523,26 @@ mod test {
         );
     }
 
-    // TEMP: verify whether a list of OBJECTS (not scalars) can round-trip
-    // through the datastore. Delete after checking.
+    // TEMP verification (delete after the approach is decided).
+    //
+    // Round-trip check: can a list of OBJECTS (not just scalars) survive the
+    // datastore's flat key/value serialization?
+    //
+    // WHY: evaluating whether NTP time-servers can stay a V1 list whose entries
+    // are either a bare URL (old) or an object (new), avoiding a V1->V2 migration.
+    //
+    // HOW: build a Vec<Entry> (Entry = a struct), run to_pairs (serialize), then
+    // from_map_with_prefix (deserialize), and assert we get the original back.
+    //
+    // RESULT: passes. The whole Vec is stored under ONE key as a JSON-array
+    // string, e.g.
+    //   ...time_servers => "[{\"address\":\"...\",\"directive\":\"...\"}, ...]"
+    // and reads back identical.
+    //
+    // CAVEAT: this works, but it goes against the datastore's own guidance. See
+    // the Serializer doc comment in this file (search "lists can only contain
+    // scalars, not further compound objects") - the recommended pattern for
+    // object collections is a HashMap with named keys (which is the doc's V2).
     #[derive(PartialEq, Debug, Serialize, serde::Deserialize)]
     struct Entry {
         address: String,
