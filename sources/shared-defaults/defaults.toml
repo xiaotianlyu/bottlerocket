@@ -92,8 +92,6 @@ template-path = "/usr/share/templates/hosts"
 # NTP
 
 [settings.ntp]
-# chrony log categories, rendered as the `log` line.
-logging = ["measurements", "statistics", "tracking"]
 
 [settings.ntp.time-servers.link-local]
 address = "169.254.169.123"
